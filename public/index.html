@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copa Jovem - Ingressos</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header com Logo -->
+        <div class="header">
+            <div class="logo">
+                <img id="logoImg" src="/images/logo.png" alt="Copa Jovem" style="display: none;">
+                <div class="logo-placeholder" id="logoPlaceholder">COPA<br>JOVEM</div>
+            </div>
+            <h1>Copa Jovem</h1>
+            <p class="subtitle">Campeonato de Futebol</p>
+        </div>
+
+        <!-- Formulário de Compra -->
+        <div class="card" id="formSection">
+            <div class="price-info">
+                <div class="price">R$ 15,00</div>
+                <div class="price-description">Ingresso Individual</div>
+            </div>
+
+            <form id="ticketForm">
+                <div class="form-group">
+                    <label for="name">Nome Completo *</label>
+                    <input type="text" id="name" name="name" required placeholder="Digite seu nome completo">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail *</label>
+                    <input type="email" id="email" name="email" required placeholder="seu@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Telefone/WhatsApp *</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="(00) 00000-0000">
+                </div>
+
+                <button type="submit" class="btn" id="submitBtn">
+                    🎫 Comprar Ingresso via PIX
+                </button>
+            </form>
+
+            <div class="error" id="errorMessage"></div>
+        </div>
+
+        <!-- Seção de Loading -->
+        <div class="loading" id="loadingSection">
+            <div class="spinner"></div>
+            <p>Gerando seu PIX...</p>
+        </div>
+
+        <!-- Seção PIX -->
+        <div class="card pix-section" id="pixSection">
+            <h2>💳 Pagamento PIX</h2>
+            <p>Escaneie o QR Code ou copie o código para pagar:</p>
+            
+            <div class="pix-qr">
+                <img id="pixQrImage" alt="QR Code PIX" style="width: 100%; height: 100%;">
+            </div>
+
+            <div class="pix-code">
+                <small>Código PIX:</small>
+                <div id="pixCodeText"></div>
+                <button class="copy-btn" onclick="copyPixCode()">📋 Copiar Código</button>
+            </div>
+
+            <div class="timer" id="paymentTimer">⏰ Tempo para pagamento: 30:00</div>
+
+            <div class="info">
+                <strong>Como pagar:</strong><br>
+                1. Abra seu app do banco<br>
+                2. Escaneie o QR Code ou cole o código<br>
+                3. Confirme o pagamento de R$ 15,00<br>
+                4. Aguarde a confirmação
+            </div>
+
+            <button class="btn" onclick="checkPaymentStatus()" id="checkBtn" style="margin-top: 20px;">
+                🔄 Verificar Pagamento
+            </button>
+        </div>
+
+        <!-- Seção de Sucesso -->
+        <div class="card success-section" id="successSection">
+            <div class="success-icon">✅</div>
+            <h2>Pagamento Confirmado!</h2>
+            <p>Seu ingresso foi gerado com sucesso!</p>
+
+            <div class="ticket-info">
+                <strong id="ticketCustomerName"></strong><br>
+                <small>Ticket ID: <span id="ticketId"></span></small>
+            </div>
+
+            <div class="ticket-qr">
+                <img id="ticketQrImage" alt="QR Code do Ingresso" style="width: 100%; height: 100%;">
+            </div>
+
+            <div class="info">
+                <strong>⚠️ IMPORTANTE:</strong><br>
+                • Salve este QR Code<br>
+                • Apresente na entrada do evento<br>
+                • Não compartilhe com terceiros<br>
+                • Válido apenas uma vez
+            </div>
+
+            <button class="btn" onclick="downloadTicket()" style="margin-top: 15px;">
+                💾 Salvar Ingresso
+            </button>
+
+            <button class="btn" onclick="newTicket()" style="background: #6c757d; margin-top: 10px;">
+                🎫 Comprar Outro Ingresso
+            </button>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

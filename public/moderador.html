@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copa Jovem - Painel do Moderador</title>
+    <link rel="stylesheet" href="/css/moderador.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <img id="logoImg" src="/images/logo.png" alt="Copa Jovem" style="display: none;">
+                <div class="logo-placeholder" id="logoPlaceholder">COPA<br>JOVEM</div>
+            </div>
+            <h1>Painel do Moderador</h1>
+            <p class="subtitle">Validação de Ingressos</p>
+        </div>
+
+        <!-- Status do Sistema -->
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-label">Status:</span>
+                <span class="status-value" id="systemStatus">🟢 Online</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Ingressos Validados:</span>
+                <span class="status-value" id="validatedCount">0</span>
+            </div>
+        </div>
+
+        <!-- Scanner de QR Code -->
+        <div class="scanner-section">
+            <div class="card">
+                <h2>📸 Scanner de QR Code</h2>
+                
+                <!-- Área da Câmera -->
+                <div class="camera-container" id="cameraContainer">
+                    <video id="video" autoplay playsinline></video>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    
+                    <!-- Overlay de escaneamento -->
+                    <div class="scan-overlay">
+                        <div class="scan-frame"></div>
+                        <p class="scan-instruction">Posicione o QR Code dentro da área</p>
+                    </div>
+                </div>
+
+                <!-- Controles -->
+                <div class="controls">
+                    <button class="btn btn-primary" id="startScanBtn" onclick="startCamera()">
+                        📸 Iniciar Câmera
+                    </button>
+                    <button class="btn btn-secondary" id="stopScanBtn" onclick="stopCamera()" style="display: none;">
+                        ⏹️ Parar Câmera
+                    </button>
+                    <button class="btn btn-secondary" id="switchCameraBtn" onclick="switchCamera()" style="display: none;">
+                        🔄 Trocar Câmera
+                    </button>
+                </div>
+
+                <!-- Upload manual de QR Code -->
+                <div class="upload-section">
+                    <p>ou</p>
+                    <label for="qrUpload" class="upload-btn">
+                        📁 Fazer Upload de Imagem
+                        <input type="file" id="qrUpload" accept="image/*" onchange="uploadQrCode(event)">
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultado da Validação -->
+        <div class="result-section" id="resultSection" style="display: none;">
+            <div class="card result-card" id="resultCard">
+                <div class="result-icon" id="resultIcon">❓</div>
+                <div class="result-content">
+                    <h3 id="resultTitle">Processando...</h3>
+                    <div class="result-details" id="resultDetails">
+                        <p id="resultMessage">Aguarde...</p>
+                        <div class="ticket-info" id="ticketInfo" style="display: none;">
+                            <p><strong>Nome:</strong> <span id="customerName"></span></p>
+                            <p><strong>Ticket ID:</strong> <span id="ticketId"></span></p>
+                            <p><strong>Preço:</strong> <span id="ticketPrice"></span></p>
+                            <p><strong>Validado em:</strong> <span id="validatedAt"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log de Validações -->
+        <div class="log-section">
+            <div class="card">
+                <h3>📋 Log de Validações</h3>
+                <div class="log-controls">
+                    <button class="btn btn-small" onclick="clearLog()">🗑️ Limpar Log</button>
+                    <button class="btn btn-small" onclick="exportLog()">💾 Exportar</button>
+                </div>
+                <div class="log-container" id="logContainer">
+                    <div class="log-empty">Nenhuma validação registrada</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="stats-section">
+            <div class="card">
+                <h3>📊 Estatísticas</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalValidated">0</div>
+                        <div class="stat-label">Válidos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalInvalid">0</div>
+                        <div class="stat-label">Inválidos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalDuplicated">0</div>
+                        <div class="stat-label">Duplicados</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalRevenue">R$ 0</div>
+                        <div class="stat-label">Arrecadação</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+    <script src="/js/moderador.js"></script>
+</body>
+</html>
