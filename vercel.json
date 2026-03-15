@@ -13,11 +13,12 @@
     }
   ],
   "env": {
-    "MONGODB_URI": "@mongodb_uri",
+    "MONGODB_URI": "mongodb+srv://copajovem:copajovem2024@cluster0.mongodb.net/copa-jovem?retryWrites=true&w=majority",
     "PIX_CHAVE": "62999646263",
     "PIX_BENEFICIARIO": "Copa Jovem", 
     "PIX_CIDADE": "Campo Grande",
-    "JWT_SECRET": "@jwt_secret",
-    "NODE_ENV": "production"
+    "JWT_SECRET": "copa_jovem_secret_2024_super_seguro",
+    "NODE_ENV": "production",
+    "PORT": "3000"
   }
 }

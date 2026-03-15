@@ -13,15 +13,27 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // Conectar ao MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/copa-jovem', {
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/copa-jovem';
+
+mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
+}).catch(err => {
+  console.error('Erro ao conectar MongoDB:', err);
+  // Continua funcionando mesmo sem MongoDB para desenvolvimento
 });
 
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'Erro na conexão MongoDB:'));
+db.on('error', (err) => {
+  console.error('Erro na conexão MongoDB:', err);
+});
 db.once('open', () => {
   console.log('✅ Conectado ao MongoDB');
+});
+
+// Tratamento de erro para produção
+process.on('unhandledRejection', (err) => {
+  console.log('Unhandled rejection:', err);
 });
 
 // Importar routes
