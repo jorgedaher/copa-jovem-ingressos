@@ -1,9 +1,11 @@
 const express = require('express');
 const QRCode = require('qrcode');
 const { v4: uuidv4 } = require('uuid');
-const Ticket = require('../models/Ticket');
 
 const router = express.Router();
+
+// Armazenamento temporário em memória (para teste sem MongoDB)
+let tempTickets = {};
 
 // Gerar PIX para pagamento
 router.post('/generate-pix', async (req, res) => {
@@ -24,9 +26,9 @@ router.post('/generate-pix', async (req, res) => {
     const amount = 15.00;
     
     // Dados PIX - configuráveis via .env
-    const pixKey = process.env.PIX_CHAVE || 'sua_chave_pix_aqui';
+    const pixKey = process.env.PIX_CHAVE || '62999646263';
     const beneficiaryName = process.env.PIX_BENEFICIARIO || 'Copa Jovem';
-    const city = process.env.PIX_CIDADE || 'Sua Cidade';
+    const city = process.env.PIX_CIDADE || 'Campo Grande';
     
     // Gerar código PIX (formato padrão brasileiro)
     const pixCode = generatePixCode({
@@ -40,18 +42,23 @@ router.post('/generate-pix', async (req, res) => {
     // Gerar QR Code do PIX
     const pixQrCode = await QRCode.toDataURL(pixCode);
 
-    // Criar ticket no banco (status pending)
-    const ticket = new Ticket({
+    // Criar ticket em memória (temporário)
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutos
+    tempTickets[ticketId] = {
       ticketId,
       customerName,
       customerEmail,
       customerPhone,
       price: amount,
       qrCode: '', // Será preenchido após confirmação do pagamento
-      paymentStatus: 'pending'
-    });
+      paymentStatus: 'pending',
+      isUsed: false,
+      usedAt: null,
+      createdAt: new Date(),
+      expiresAt
+    };
 
-    await ticket.save();
+    console.log('Ticket criado:', ticketId);
 
     res.json({
       ticketId,
@@ -59,7 +66,7 @@ router.post('/generate-pix', async (req, res) => {
       pixQrCode,
       amount,
       customerName,
-      expiresAt: ticket.expiresAt,
+      expiresAt,
       message: 'PIX gerado com sucesso! Realize o pagamento para confirmar seu ingresso.'
     });
 
@@ -78,7 +85,7 @@ router.post('/confirm-payment', async (req, res) => {
       return res.status(400).json({ error: 'ID do ticket é obrigatório' });
     }
 
-    const ticket = await Ticket.findOne({ ticketId });
+    const ticket = tempTickets[ticketId];
     
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket não encontrado' });
@@ -106,7 +113,8 @@ router.post('/confirm-payment', async (req, res) => {
     // Atualizar status do ticket
     ticket.paymentStatus = 'paid';
     ticket.qrCode = ticketQrCode;
-    await ticket.save();
+
+    console.log('Pagamento confirmado para:', ticketId);
 
     res.json({
       success: true,
@@ -130,7 +138,7 @@ router.get('/status/:ticketId', async (req, res) => {
   try {
     const { ticketId } = req.params;
     
-    const ticket = await Ticket.findOne({ ticketId });
+    const ticket = tempTickets[ticketId];
     
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket não encontrado' });
@@ -146,6 +154,31 @@ router.get('/status/:ticketId', async (req, res) => {
   } catch (error) {
     console.error('Erro ao verificar status:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// Simulador de pagamento (para teste)
+router.post('/simulate-payment/:ticketId', async (req, res) => {
+  try {
+    const { ticketId } = req.params;
+    
+    // Simular confirmação automática após 5 segundos
+    setTimeout(async () => {
+      const ticket = tempTickets[ticketId];
+      if (ticket && ticket.paymentStatus === 'pending') {
+        // Confirmar pagamento automaticamente
+        const confirmRes = await fetch(`${req.protocol}://${req.get('host')}/api/payments/confirm-payment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticketId, transactionId: 'SIM_' + Date.now() })
+        });
+        console.log('Pagamento simulado para:', ticketId);
+      }
+    }, 5000);
+
+    res.json({ message: 'Simulação de pagamento iniciada' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro na simulação' });
   }
 });
 

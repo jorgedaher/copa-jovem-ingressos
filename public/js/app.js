@@ -89,6 +89,18 @@ document.getElementById('ticketForm').addEventListener('submit', async function(
         showSection('pixSection');
         startPaymentTimer(30 * 60); // 30 minutos
         
+        // Simular pagamento após 10 segundos (para demonstração)
+        setTimeout(async () => {
+            try {
+                await fetch(`/api/payments/simulate-payment/${data.ticketId}`, {
+                    method: 'POST'
+                });
+                console.log('Simulação de pagamento iniciada');
+            } catch (error) {
+                console.error('Erro na simulação:', error);
+            }
+        }, 10000); // 10 segundos
+        
     } catch (error) {
         console.error('Erro:', error);
         showError('Erro ao gerar PIX: ' + error.message);
