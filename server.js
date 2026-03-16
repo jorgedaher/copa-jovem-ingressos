@@ -35,23 +35,23 @@ function generatePixCode(amount = 15.00, description = 'Copa Jovem Ingresso') {
     const merchantCity = 'GOIANIA';
     const pixKey = '62999646263'; // Sua chave PIX
     
-    // Formato EMV PIX
+    // Formato EMV PIX correto
     let pixData = '';
     
     // Payload Format Indicator
     pixData += '000201';
     
-    // Point of Initiation Method
-    pixData += '010212';
+    // Point of Initiation Method (01 = estático, 12 = dinâmico)
+    pixData += '010211';
     
-    // Merchant Account Information
-    const merchantInfo = `0014br.gov.bcb.pix01${pixKey.length.toString().padStart(2, '0')}${pixKey}`;
-    pixData += `26${merchantInfo.length.toString().padStart(2, '0')}${merchantInfo}`;
+    // Merchant Account Information (26 = PIX)
+    const pixKeyFormatted = `0014br.gov.bcb.pix01${pixKey.length.toString().padStart(2, '0')}${pixKey}`;
+    pixData += `26${pixKeyFormatted.length.toString().padStart(2, '0')}${pixKeyFormatted}`;
     
     // Merchant Category Code
     pixData += '52040000';
     
-    // Transaction Currency
+    // Transaction Currency (986 = BRL)
     pixData += '5303986';
     
     // Transaction Amount
@@ -67,16 +67,17 @@ function generatePixCode(amount = 15.00, description = 'Copa Jovem Ingresso') {
     // Merchant City
     pixData += `60${merchantCity.length.toString().padStart(2, '0')}${merchantCity}`;
     
-    // Additional Data Field Template
+    // Additional Data Field Template (txid)
     if (description) {
-        const additionalInfo = `05${description.length.toString().padStart(2, '0')}${description}`;
+        const txid = description.replace(/\s+/g, '').substring(0, 25);
+        const additionalInfo = `05${txid.length.toString().padStart(2, '0')}${txid}`;
         pixData += `62${additionalInfo.length.toString().padStart(2, '0')}${additionalInfo}`;
     }
     
-    // CRC16
-    pixData += '6304';
-    const crcCode = crc16(pixData);
-    pixData += crcCode;
+    // CRC16 (deve ser calculado sem o CRC)
+    const pixDataForCRC = pixData + '6304';
+    const crcCode = crc16(pixDataForCRC);
+    pixData += '6304' + crcCode;
     
     return pixData;
 }
@@ -84,6 +85,44 @@ function generatePixCode(amount = 15.00, description = 'Copa Jovem Ingresso') {
 // Gerar ID único
 function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+// Função para enviar WhatsApp (usando API do WhatsApp Business)
+async function sendWhatsApp(phone, message) {
+    // Aqui você pode integrar com WhatsApp Business API
+    // Por enquanto, apenas log para demonstração
+    console.log(`WhatsApp para ${phone}: ${message}`);
+    return { success: true };
+}
+
+// Função para enviar Email
+async function sendEmail(email, subject, message) {
+    // Aqui você pode integrar com SendGrid, Nodemailer, etc.
+    // Por enquanto, apenas log para demonstração
+    console.log(`Email para ${email}: ${subject}\n${message}`);
+    return { success: true };
+}
+
+// Gerar QR Code do ticket
+async function generateTicketQR(ticketData) {
+    const ticketInfo = {
+        id: ticketData.ticketId,
+        nome: ticketData.customerName,
+        evento: 'Copa Jovem 2026',
+        valor: 'R$ 15,00',
+        data: new Date().toISOString(),
+        valido: true
+    };
+    
+    const qrData = JSON.stringify(ticketInfo);
+    return await QRCode.toDataURL(qrData, {
+        width: 300,
+        margin: 2,
+        color: {
+            dark: '#1e40af',
+            light: '#ffffff'
+        }
+    });
 }
 
 // Rota para gerar PIX
@@ -121,22 +160,15 @@ app.post('/api/payments/generate-pix', async (req, res) => {
         };
         
         tickets.set(ticketId, ticket);
-        payments.set(ticketId, { status: 'pending', createdAt: new Date() });
+        payments.set(ticketId, { 
+            status: 'pending', 
+            createdAt: new Date(),
+            pixCode: pixCode,
+            amount: 15.00
+        });
         
-        // Simular pagamento após 15 segundos
-        setTimeout(() => {
-            const payment = payments.get(ticketId);
-            if (payment && payment.status === 'pending') {
-                payment.status = 'paid';
-                payment.paidAt = new Date();
-                
-                const ticketData = tickets.get(ticketId);
-                if (ticketData) {
-                    ticketData.status = 'paid';
-                    ticketData.paidAt = new Date().toISOString();
-                }
-            }
-        }, 15000);
+        // Aguardar confirmação REAL do pagamento
+        // Remover simulação automática - agora depende de confirmação externa
         
         res.json({
             ticketId,
@@ -169,34 +201,126 @@ app.get('/api/payments/status/:ticketId', (req, res) => {
     });
 });
 
-// Simular pagamento (para testes)
-app.post('/api/payments/simulate-payment/:ticketId', (req, res) => {
+// Confirmar pagamento PIX (rota para webhook ou confirmação manual)
+app.post('/api/payments/confirm-payment/:ticketId', async (req, res) => {
     const { ticketId } = req.params;
+    const { transactionId, amount } = req.body;
     
     const payment = payments.get(ticketId);
     if (!payment) {
         return res.status(404).json({ error: 'Pagamento não encontrado' });
     }
     
+    if (payment.status === 'paid') {
+        return res.json({ success: true, message: 'Pagamento já confirmado' });
+    }
+    
+    // Confirmar pagamento
     payment.status = 'paid';
     payment.paidAt = new Date();
+    payment.transactionId = transactionId;
     
     const ticket = tickets.get(ticketId);
     if (ticket) {
         ticket.status = 'paid';
         ticket.paidAt = new Date().toISOString();
+        
+        // Gerar QR Code do ingresso
+        const ticketQRCode = await generateTicketQR(ticket);
+        ticket.qrCode = ticketQRCode;
+        
+        // Enviar por WhatsApp
+        const whatsappMessage = `🎫 *COPA JOVEM - INGRESSO CONFIRMADO*\n\n` +
+                               `Olá ${ticket.customerName}!\n\n` +
+                               `Seu pagamento foi confirmado!\n` +
+                               `Valor: R$ 15,00\n` +
+                               `Ticket ID: ${ticket.ticketId}\n\n` +
+                               `⚠️ *IMPORTANTE:*\n` +
+                               `• Apresente o QR Code na entrada\n` +
+                               `• Válido apenas uma vez\n` +
+                               `• Guarde bem este código\n\n` +
+                               `Nos vemos na Copa Jovem! ⚽`;
+        
+        await sendWhatsApp(ticket.customerPhone, whatsappMessage);
+        
+        // Enviar por Email
+        const emailMessage = `<h2>🎫 Copa Jovem - Ingresso Confirmado!</h2>\n` +
+                            `<p><strong>Olá ${ticket.customerName}!</strong></p>\n` +
+                            `<p>Seu pagamento foi confirmado com sucesso!</p>\n` +
+                            `<ul>\n` +
+                            `<li>Valor: R$ 15,00</li>\n` +
+                            `<li>Ticket ID: ${ticket.ticketId}</li>\n` +
+                            `<li>Data: ${new Date().toLocaleDateString('pt-BR')}</li>\n` +
+                            `</ul>\n` +
+                            `<h3>⚠️ IMPORTANTE:</h3>\n` +
+                            `<ul>\n` +
+                            `<li>Apresente o QR Code na entrada</li>\n` +
+                            `<li>Válido apenas uma vez</li>\n` +
+                            `<li>Guarde bem este código</li>\n` +
+                            `</ul>\n` +
+                            `<p>Nos vemos na Copa Jovem! ⚽</p>`;
+        
+        await sendEmail(ticket.customerEmail, 'Copa Jovem - Seu Ingresso', emailMessage);
     }
     
-    res.json({ success: true, status: 'paid' });
+    res.json({ 
+        success: true, 
+        status: 'paid',
+        ticketQRCode: ticket.qrCode
+    });
+});
+
+// Rota para confirmação manual (para o organizador)
+app.post('/api/admin/confirm-payment/:ticketId', async (req, res) => {
+    return await app._router.handle({
+        method: 'POST',
+        url: `/api/payments/confirm-payment/${req.params.ticketId}`,
+        body: req.body
+    }, res);
+});
+
+// Webhook PIX (para integração com bancos)
+app.post('/api/webhook/pix', async (req, res) => {
+    try {
+        // Aqui você processaria o webhook do seu provedor PIX
+        const { pixKey, amount, transactionId, endToEndId } = req.body;
+        
+        // Encontrar pagamento correspondente
+        for (const [ticketId, payment] of payments.entries()) {
+            if (payment.status === 'pending' && 
+                payment.pixCode && 
+                payment.amount === amount) {
+                
+                // Confirmar pagamento
+                await app._router.handle({
+                    method: 'POST',
+                    url: `/api/payments/confirm-payment/${ticketId}`,
+                    body: { transactionId, amount }
+                }, res);
+                
+                return;
+            }
+        }
+        
+        res.status(404).json({ error: 'Pagamento não encontrado' });
+    } catch (error) {
+        console.error('Erro no webhook PIX:', error);
+        res.status(500).json({ error: 'Erro interno' });
+    }
 });
 
 // Buscar ticket
-app.get('/api/tickets/:ticketId', (req, res) => {
+app.get('/api/tickets/:ticketId', async (req, res) => {
     const { ticketId } = req.params;
     
     const ticket = tickets.get(ticketId);
     if (!ticket) {
         return res.status(404).json({ error: 'Ticket não encontrado' });
+    }
+    
+    // Se o ticket foi pago mas não tem QR Code, gerar
+    if (ticket.status === 'paid' && !ticket.qrCode) {
+        ticket.qrCode = await generateTicketQR(ticket);
     }
     
     res.json(ticket);
@@ -270,6 +394,11 @@ app.get('/', (req, res) => {
 // Página do moderador
 app.get('/moderador', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'moderador.html'));
+});
+
+// Página do admin
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
 // Health check

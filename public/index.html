@@ -422,7 +422,7 @@
                 </div>
 
                 <div class="timer">
-                    ⏰ <span id="timer">Aguardando pagamento...</span>
+                    ⏰ <span id="timer">Aguardando confirmação do pagamento PIX...</span>
                 </div>
 
                 <div class="instructions">
@@ -430,9 +430,12 @@
                     <ol>
                         <li>Abra seu app do banco</li>
                         <li>Escaneie o QR Code ou cole o código</li>
-                        <li>Confirme R$ 15,00</li>
-                        <li>Aguarde a confirmação</li>
+                        <li>Confirme R$ 15,00 para <strong>RAFAEL SILVA</strong></li>
+                        <li>Aguarde a confirmação (pode levar alguns minutos)</li>
                     </ol>
+                    <div style="background: #fef3c7; padding: 10px; border-radius: 8px; margin-top: 10px; color: #92400e; font-size: 14px; border: 1px solid #fcd34d;">
+                        💳 <strong>PIX para:</strong> RAFAEL SILVA - (62) 99964-6263
+                    </div>
                 </div>
 
                 <button type="button" class="btn" onclick="checkPayment()">
@@ -530,7 +533,7 @@
         };
 
         function startChecking() {
-            checkTimer = setInterval(checkPayment, 3000);
+            checkTimer = setInterval(checkPayment, 5000); // Verificar a cada 5 segundos
         }
 
         async function checkPayment() {
@@ -635,21 +638,11 @@
             }, 5000);
         }
 
-        // Simular pagamento após 15 segundos para demonstração
-        function simulatePayment() {
-            if (currentTicket) {
-                fetch(`/api/payments/simulate-payment/${currentTicket.ticketId}`, {
-                    method: 'POST'
-                });
-            }
+        // Função para gerar QR Code do ticket após pagamento confirmado
+        async function generateTicketQR(ticketData) {
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(JSON.stringify(ticketData))}`;
+            return qrUrl;
         }
-
-        // Auto-simular para demonstração
-        setTimeout(() => {
-            if (document.getElementById('pixSection').classList.contains('hidden') === false) {
-                simulatePayment();
-            }
-        }, 15000);
     </script>
 </body>
 </html>
