@@ -3,198 +3,646 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Copa Jovem - Ingressos</title>
-    <meta name="description" content="Compre seu ingresso para a Copa Jovem - Campeonato de Futebol. Pagamento via PIX, apenas R$ 15,00!">
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/images/logo.png">
-    
-    <!-- Meta tags -->
-    <meta name="theme-color" content="#1e40af">
-    <meta property="og:title" content="Copa Jovem - Ingressos">
-    <meta property="og:description" content="Garanta já seu ingresso! Apenas R$ 15,00 via PIX">
-    <meta property="og:image" content="/images/logo.png">
-    <meta property="og:type" content="website">
-    
-    <link rel="stylesheet" href="/css/style.css">
+    <title>Copa Jovem - Ingressos R$ 15,00</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #1e40af;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .price-box {
+            text-align: center;
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .price {
+            font-size: 3em;
+            font-weight: 900;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+
+        .price-desc {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pix-section {
+            text-align: center;
+        }
+
+        .pix-qr {
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 10px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .pix-qr img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .pix-code {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .copy-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #059669;
+        }
+
+        .timer {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 700;
+            text-align: center;
+            border: 1px solid #fca5a5;
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1e40af;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #93c5fd;
+        }
+
+        .instructions h4 {
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .success-section {
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .success-title {
+            font-size: 1.8em;
+            color: #10b981;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .ticket-info {
+            background: #f0fdf4;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 1px solid #bbf7d0;
+        }
+
+        .customer-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #064e3b;
+            margin-bottom: 5px;
+        }
+
+        .ticket-id {
+            font-size: 0.9em;
+            color: #059669;
+            font-family: monospace;
+        }
+
+        .ticket-qr {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            border: 3px solid #10b981;
+            border-radius: 15px;
+            padding: 10px;
+            background: white;
+        }
+
+        .ticket-qr img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #059669;
+            border: 1px solid #bbf7d0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            .card {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .price {
+                font-size: 2.5em;
+            }
+            .pix-qr, .ticket-qr {
+                width: 200px;
+                height: 200px;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header Principal -->
-        <header class="header">
-            <div class="logo-container floating">
-                <div class="logo glow">
-                    <img id="logoImg" src="/images/logo.png" alt="Copa Jovem" style="display: none;">
-                    <div class="logo-placeholder" id="logoPlaceholder">COPA<br>JOVEM</div>
-                </div>
+        <div class="header">
+            <div class="logo">
+                COPA<br>JOVEM
             </div>
-            <h1 class="main-title">Copa Jovem</h1>
+            <h1>Copa Jovem</h1>
             <p class="subtitle">Campeonato de Futebol 2026</p>
-        </header>
-
-        <!-- Card Principal de Compra -->
-        <main class="main-card" id="formSection">
-            <!-- Seção de Preço -->
-            <section class="price-section">
-                <div class="price-value">R$ 15,00</div>
-                <div class="price-description">Ingresso Individual</div>
-                <div class="price-features">
-                    <span class="price-feature">Ingresso Digital</span>
-                    <span class="price-feature">Pagamento PIX</span>
-                    <span class="price-feature">Válido uma vez</span>
-                </div>
-            </section>
-
-            <!-- Formulário -->
-            <section class="form-section">
-                <form id="ticketForm">
-                    <div class="form-group">
-                        <label class="form-label" for="name">Nome Completo</label>
-                        <input 
-                            type="text" 
-                            id="name" 
-                            name="name" 
-                            class="form-input" 
-                            required 
-                            placeholder="Digite seu nome completo"
-                            autocomplete="name"
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="email">E-mail</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            class="form-input" 
-                            required 
-                            placeholder="seu@email.com"
-                            autocomplete="email"
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="phone">WhatsApp</label>
-                        <input 
-                            type="tel" 
-                            id="phone" 
-                            name="phone" 
-                            class="form-input" 
-                            required 
-                            placeholder="(62) 00000-0000"
-                            autocomplete="tel"
-                        >
-                    </div>
-
-                    <button type="submit" class="primary-btn" id="submitBtn">
-                        🎫 Comprar Ingresso via PIX
-                    </button>
-                </form>
-
-                <!-- Alert de Erro -->
-                <div class="alert alert-error" id="errorMessage"></div>
-            </section>
-        </main>
-
-        <!-- Seção de Loading -->
-        <div class="main-card loading-section" id="loadingSection">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">Gerando seu PIX...</div>
         </div>
 
-        <!-- Seção PIX -->
-        <div class="main-card pix-section" id="pixSection">
-            <div class="pix-header">
-                <h2 class="pix-title">💳 Pagamento PIX</h2>
-                <p class="pix-description">Escaneie o QR Code ou copie o código abaixo:</p>
+        <!-- Formulário de Compra -->
+        <div class="card" id="buySection">
+            <div class="price-box">
+                <div class="price">R$ 15,00</div>
+                <div class="price-desc">Ingresso Individual</div>
             </div>
 
-            <div class="pix-qr-container">
-                <div class="pix-qr">
-                    <img id="pixQrImage" alt="QR Code PIX">
+            <form id="buyForm">
+                <div class="form-group">
+                    <label for="name">Nome Completo</label>
+                    <input type="text" id="name" required placeholder="Seu nome completo">
                 </div>
-            </div>
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone">WhatsApp</label>
+                    <input type="tel" id="phone" required placeholder="(62) 99999-9999">
+                </div>
+                <button type="submit" class="btn">
+                    🎫 Gerar PIX - R$ 15,00
+                </button>
+            </form>
 
-            <div class="pix-code-section">
-                <div class="pix-code-label">Código PIX para cópia:</div>
-                <div class="pix-code-text" id="pixCodeText"></div>
-                <button class="secondary-btn" onclick="copyPixCode()">📋 Copiar Código</button>
-            </div>
-
-            <div class="timer">
-                <div class="timer-text" id="paymentTimer">⏰ Tempo para pagamento: 30:00</div>
-            </div>
-
-            <div class="info-box">
-                <div class="info-title">Como pagar:</div>
-                <ul class="info-steps">
-                    <li>Abra seu app do banco</li>
-                    <li>Escaneie o QR Code ou cole o código</li>
-                    <li>Confirme o pagamento de R$ 15,00</li>
-                    <li>Aguarde a confirmação automática</li>
-                </ul>
-            </div>
-
-            <button class="primary-btn" onclick="checkPaymentStatus()" id="checkBtn">
-                🔄 Verificar Pagamento
-            </button>
+            <div class="alert alert-error hidden" id="errorMsg"></div>
         </div>
 
-        <!-- Seção de Sucesso -->
-        <div class="main-card success-section" id="successSection">
-            <div class="success-icon">🎉</div>
-            <h2 class="success-title">Pagamento Confirmado!</h2>
-            <p class="success-message">Seu ingresso foi gerado com sucesso!</p>
+        <!-- Loading -->
+        <div class="card loading hidden" id="loadingSection">
+            <div class="spinner"></div>
+            <p><strong>Gerando seu PIX...</strong></p>
+        </div>
 
-            <div class="ticket-info-box">
-                <div class="customer-name" id="ticketCustomerName"></div>
-                <div class="ticket-id">Ticket ID: <span id="ticketId"></span></div>
+        <!-- PIX -->
+        <div class="card hidden" id="pixSection">
+            <div class="pix-section">
+                <h2>💳 Pagamento PIX</h2>
+                <p>Escaneie o QR Code ou copie o código:</p>
                 
-                <div class="ticket-qr">
-                    <img id="ticketQrImage" alt="QR Code do Ingresso">
+                <div class="pix-qr">
+                    <img id="pixQrImg" alt="QR Code PIX">
                 </div>
-            </div>
 
-            <div class="info-box">
-                <div class="info-title">⚠️ IMPORTANTE:</div>
-                <ul class="info-steps">
-                    <li>Salve este QR Code no seu celular</li>
-                    <li>Apresente na entrada do evento</li>
-                    <li>Não compartilhe com terceiros</li>
-                    <li>Válido apenas uma vez</li>
-                </ul>
-            </div>
+                <div class="pix-code">
+                    <div id="pixCodeText"></div>
+                    <button type="button" class="copy-btn" onclick="copyPix()">
+                        📋 Copiar Código PIX
+                    </button>
+                </div>
 
-            <div class="btn-group">
-                <button class="primary-btn" onclick="downloadTicket()">
-                    💾 Baixar Ingresso
-                </button>
-                <button class="secondary-btn" onclick="newTicket()">
-                    🎫 Novo Ingresso
+                <div class="timer">
+                    ⏰ <span id="timer">Aguardando pagamento...</span>
+                </div>
+
+                <div class="instructions">
+                    <h4>Como pagar:</h4>
+                    <ol>
+                        <li>Abra seu app do banco</li>
+                        <li>Escaneie o QR Code ou cole o código</li>
+                        <li>Confirme R$ 15,00</li>
+                        <li>Aguarde a confirmação</li>
+                    </ol>
+                </div>
+
+                <button type="button" class="btn" onclick="checkPayment()">
+                    🔄 Verificar Pagamento
                 </button>
             </div>
         </div>
 
-        <!-- Footer -->
-        <footer style="text-align: center; margin-top: 40px; color: rgba(255,255,255,0.7); font-size: 14px;">
-            <p>&copy; 2026 Copa Jovem. Todos os direitos reservados.</p>
-            <p>Suporte: (62) 98401-6464 - Rafael</p>
-        </footer>
+        <!-- Sucesso -->
+        <div class="card hidden" id="successSection">
+            <div class="success-section">
+                <div class="success-icon">🎉</div>
+                <h2 class="success-title">Ingresso Confirmado!</h2>
+                
+                <div class="ticket-info">
+                    <div class="customer-name" id="customerName"></div>
+                    <div class="ticket-id">ID: <span id="ticketIdDisplay"></span></div>
+                </div>
+
+                <div class="ticket-qr">
+                    <img id="ticketQrImg" alt="QR Code do Ingresso">
+                </div>
+
+                <div class="instructions">
+                    <h4>⚠️ IMPORTANTE:</h4>
+                    <ol>
+                        <li>Salve este QR Code</li>
+                        <li>Apresente na entrada</li>
+                        <li>Válido apenas uma vez</li>
+                    </ol>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn" onclick="downloadTicket()">
+                        💾 Baixar
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="newTicket()">
+                        🎫 Novo
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="/js/app.js"></script>
-    
-    <!-- Analytics (opcional) -->
     <script>
-        // Google Analytics ou outros trackers podem ser adicionados aqui
+        let currentTicket = null;
+        let pixCode = '';
+        let checkTimer = null;
+
+        // Formulário
+        document.getElementById('buyForm').onsubmit = async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!name || !email || !phone) {
+                showError('Preencha todos os campos');
+                return;
+            }
+
+            showSection('loadingSection');
+
+            try {
+                const response = await fetch('/api/payments/generate-pix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customerName: name,
+                        customerEmail: email,
+                        customerPhone: phone
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erro ao gerar PIX');
+                }
+
+                currentTicket = data;
+                pixCode = data.pixCode;
+
+                document.getElementById('pixQrImg').src = data.pixQrCode;
+                document.getElementById('pixCodeText').textContent = data.pixCode;
+
+                showSection('pixSection');
+                startChecking();
+
+            } catch (error) {
+                showError(error.message);
+                showSection('buySection');
+            }
+        };
+
+        function startChecking() {
+            checkTimer = setInterval(checkPayment, 3000);
+        }
+
+        async function checkPayment() {
+            if (!currentTicket) return;
+
+            try {
+                const response = await fetch(`/api/payments/status/${currentTicket.ticketId}`);
+                const data = await response.json();
+
+                if (data.paymentStatus === 'paid') {
+                    clearInterval(checkTimer);
+                    
+                    // Buscar dados completos
+                    const ticketResponse = await fetch(`/api/tickets/${currentTicket.ticketId}`);
+                    
+                    document.getElementById('customerName').textContent = currentTicket.customerName;
+                    document.getElementById('ticketIdDisplay').textContent = currentTicket.ticketId;
+                    
+                    // Gerar QR do ingresso
+                    const ticketData = JSON.stringify({
+                        ticketId: currentTicket.ticketId,
+                        customerName: currentTicket.customerName,
+                        price: 15.00,
+                        event: 'Copa Jovem',
+                        issuedAt: new Date().toISOString()
+                    });
+                    
+                    // Para demonstração, vou usar uma API de QR Code pública
+                    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(ticketData)}`;
+                    document.getElementById('ticketQrImg').src = qrUrl;
+                    
+                    showSection('successSection');
+                }
+            } catch (error) {
+                console.error('Erro ao verificar:', error);
+            }
+        }
+
+        function copyPix() {
+            navigator.clipboard.writeText(pixCode).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copiado!';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
+        function downloadTicket() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 400;
+            canvas.height = 500;
+
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#1e40af';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('COPA JOVEM 2026', canvas.width/2, 50);
+
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#333';
+            ctx.fillText(currentTicket.customerName, canvas.width/2, 100);
+
+            ctx.font = '12px Arial';
+            ctx.fillText(`ID: ${currentTicket.ticketId}`, canvas.width/2, 120);
+            ctx.fillText('R$ 15,00', canvas.width/2, 140);
+
+            const link = document.createElement('a');
+            link.download = `copa-jovem-${currentTicket.ticketId}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function newTicket() {
+            currentTicket = null;
+            pixCode = '';
+            if (checkTimer) clearInterval(checkTimer);
+            document.getElementById('buyForm').reset();
+            showSection('buySection');
+        }
+
+        function showSection(sectionId) {
+            const sections = ['buySection', 'loadingSection', 'pixSection', 'successSection'];
+            sections.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMsg');
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+            setTimeout(() => {
+                errorEl.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Simular pagamento após 15 segundos para demonstração
+        function simulatePayment() {
+            if (currentTicket) {
+                fetch(`/api/payments/simulate-payment/${currentTicket.ticketId}`, {
+                    method: 'POST'
+                });
+            }
+        }
+
+        // Auto-simular para demonstração
+        setTimeout(() => {
+            if (document.getElementById('pixSection').classList.contains('hidden') === false) {
+                simulatePayment();
+            }
+        }, 15000);
     </script>
 </body>
 </html>

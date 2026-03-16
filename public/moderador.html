@@ -3,135 +3,444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Copa Jovem - Painel do Moderador</title>
-    <link rel="stylesheet" href="/css/moderador.css">
+    <title>Copa Jovem - Moderador</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #1e40af;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .scanner-section {
+            text-align: center;
+        }
+
+        #video {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            border: 3px solid #e5e7eb;
+            border-radius: 15px;
+            background: #f8fafc;
+            margin: 20px 0;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px 0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .result {
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .result-valid {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #064e3b;
+            border: 2px solid #10b981;
+        }
+
+        .result-invalid {
+            background: linear-gradient(135deg, #fee2e2, #fca5a5);
+            color: #7f1d1d;
+            border: 2px solid #ef4444;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 900;
+            color: #1e40af;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .ticket-info {
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 1px solid #bbf7d0;
+        }
+
+        .manual-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            .card {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div class="logo">
-                <img id="logoImg" src="/images/logo.png" alt="Copa Jovem" style="display: none;">
-                <div class="logo-placeholder" id="logoPlaceholder">COPA<br>JOVEM</div>
+                COPA<br>JOVEM
             </div>
             <h1>Painel do Moderador</h1>
-            <p class="subtitle">Validação de Ingressos</p>
-        </div>
-
-        <!-- Status do Sistema -->
-        <div class="status-bar">
-            <div class="status-item">
-                <span class="status-label">Status:</span>
-                <span class="status-value" id="systemStatus">🟢 Online</span>
-            </div>
-            <div class="status-item">
-                <span class="status-label">Ingressos Validados:</span>
-                <span class="status-value" id="validatedCount">0</span>
-            </div>
-        </div>
-
-        <!-- Scanner de QR Code -->
-        <div class="scanner-section">
-            <div class="card">
-                <h2>📸 Scanner de QR Code</h2>
-                
-                <!-- Área da Câmera -->
-                <div class="camera-container" id="cameraContainer">
-                    <video id="video" autoplay playsinline></video>
-                    <canvas id="canvas" style="display: none;"></canvas>
-                    
-                    <!-- Overlay de escaneamento -->
-                    <div class="scan-overlay">
-                        <div class="scan-frame"></div>
-                        <p class="scan-instruction">Posicione o QR Code dentro da área</p>
-                    </div>
-                </div>
-
-                <!-- Controles -->
-                <div class="controls">
-                    <button class="btn btn-primary" id="startScanBtn" onclick="startCamera()">
-                        📸 Iniciar Câmera
-                    </button>
-                    <button class="btn btn-secondary" id="stopScanBtn" onclick="stopCamera()" style="display: none;">
-                        ⏹️ Parar Câmera
-                    </button>
-                    <button class="btn btn-secondary" id="switchCameraBtn" onclick="switchCamera()" style="display: none;">
-                        🔄 Trocar Câmera
-                    </button>
-                </div>
-
-                <!-- Upload manual de QR Code -->
-                <div class="upload-section">
-                    <p>ou</p>
-                    <label for="qrUpload" class="upload-btn">
-                        📁 Fazer Upload de Imagem
-                        <input type="file" id="qrUpload" accept="image/*" onchange="uploadQrCode(event)">
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- Resultado da Validação -->
-        <div class="result-section" id="resultSection" style="display: none;">
-            <div class="card result-card" id="resultCard">
-                <div class="result-icon" id="resultIcon">❓</div>
-                <div class="result-content">
-                    <h3 id="resultTitle">Processando...</h3>
-                    <div class="result-details" id="resultDetails">
-                        <p id="resultMessage">Aguarde...</p>
-                        <div class="ticket-info" id="ticketInfo" style="display: none;">
-                            <p><strong>Nome:</strong> <span id="customerName"></span></p>
-                            <p><strong>Ticket ID:</strong> <span id="ticketId"></span></p>
-                            <p><strong>Preço:</strong> <span id="ticketPrice"></span></p>
-                            <p><strong>Validado em:</strong> <span id="validatedAt"></span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Log de Validações -->
-        <div class="log-section">
-            <div class="card">
-                <h3>📋 Log de Validações</h3>
-                <div class="log-controls">
-                    <button class="btn btn-small" onclick="clearLog()">🗑️ Limpar Log</button>
-                    <button class="btn btn-small" onclick="exportLog()">💾 Exportar</button>
-                </div>
-                <div class="log-container" id="logContainer">
-                    <div class="log-empty">Nenhuma validação registrada</div>
-                </div>
-            </div>
+            <p>Validação de Ingressos</p>
         </div>
 
         <!-- Estatísticas -->
-        <div class="stats-section">
-            <div class="card">
-                <h3>📊 Estatísticas</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number" id="totalValidated">0</div>
-                        <div class="stat-label">Válidos</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="totalInvalid">0</div>
-                        <div class="stat-label">Inválidos</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="totalDuplicated">0</div>
-                        <div class="stat-label">Duplicados</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="totalRevenue">R$ 0</div>
-                        <div class="stat-label">Arrecadação</div>
-                    </div>
+        <div class="card">
+            <h3 style="margin-bottom: 20px; text-align: center; color: #1e40af;">📊 Estatísticas</h3>
+            <div class="stats" id="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalTickets">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="paidTickets">0</div>
+                    <div class="stat-label">Pagos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="usedTickets">0</div>
+                    <div class="stat-label">Usados</div>
                 </div>
             </div>
+            <button class="btn" onclick="loadStats()">🔄 Atualizar</button>
         </div>
+
+        <!-- Scanner QR -->
+        <div class="card">
+            <div class="scanner-section">
+                <h3 style="margin-bottom: 20px; color: #1e40af;">📱 Scanner QR Code</h3>
+                <video id="video" autoplay playsinline></video>
+                <button id="startScanBtn" class="btn" onclick="startCamera()">📹 Iniciar Câmera</button>
+                <button id="stopScanBtn" class="btn btn-danger hidden" onclick="stopCamera()">⏹️ Parar</button>
+            </div>
+        </div>
+
+        <!-- Validação Manual -->
+        <div class="card">
+            <div class="manual-section">
+                <h3 style="margin-bottom: 20px; color: #1e40af;">✏️ Validação Manual</h3>
+                <div class="input-group">
+                    <label for="ticketId">ID do Ticket:</label>
+                    <input type="text" id="ticketId" placeholder="Digite o ID do ticket">
+                </div>
+                <button class="btn" onclick="validateManual()">✅ Validar Ticket</button>
+            </div>
+        </div>
+
+        <!-- Resultado -->
+        <div id="result" class="hidden"></div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
-    <script src="/js/moderador.js"></script>
+    <!-- jsQR Library -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    
+    <script>
+        let video, canvas, context, scanning = false;
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            video = document.getElementById('video');
+            canvas = document.createElement('canvas');
+            context = canvas.getContext('2d');
+        });
+
+        // Carregar estatísticas
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/admin/tickets');
+                const data = await response.json();
+                
+                document.getElementById('totalTickets').textContent = data.total || 0;
+                document.getElementById('paidTickets').textContent = data.paid || 0;
+                document.getElementById('usedTickets').textContent = data.used || 0;
+            } catch (error) {
+                console.error('Erro ao carregar stats:', error);
+                showResult('Erro ao carregar estatísticas', 'invalid');
+            }
+        }
+
+        // Iniciar câmera
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }
+                });
+                
+                video.srcObject = stream;
+                video.play();
+                
+                document.getElementById('startScanBtn').classList.add('hidden');
+                document.getElementById('stopScanBtn').classList.remove('hidden');
+                
+                scanning = true;
+                scanQRCode();
+                
+            } catch (error) {
+                console.error('Erro ao acessar câmera:', error);
+                showResult('Erro ao acessar a câmera. Verifique as permissões.', 'invalid');
+            }
+        }
+
+        // Parar câmera
+        function stopCamera() {
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+            
+            scanning = false;
+            
+            document.getElementById('startScanBtn').classList.remove('hidden');
+            document.getElementById('stopScanBtn').classList.add('hidden');
+        }
+
+        // Escanear QR Code
+        function scanQRCode() {
+            if (!scanning) return;
+
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.height = video.videoHeight;
+                canvas.width = video.videoWidth;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+
+                if (code) {
+                    console.log('QR Code detectado:', code.data);
+                    processQRCode(code.data);
+                    stopCamera();
+                    return;
+                }
+            }
+
+            requestAnimationFrame(scanQRCode);
+        }
+
+        // Processar QR Code
+        async function processQRCode(qrData) {
+            try {
+                // Tentar parsear como JSON (ticket)
+                let ticketId;
+                
+                try {
+                    const ticketData = JSON.parse(qrData);
+                    ticketId = ticketData.ticketId;
+                } catch {
+                    // Se não for JSON, usar o texto como ID
+                    ticketId = qrData;
+                }
+                
+                if (!ticketId) {
+                    showResult('QR Code inválido - ID não encontrado', 'invalid');
+                    return;
+                }
+                
+                await validateTicket(ticketId);
+                
+            } catch (error) {
+                console.error('Erro ao processar QR:', error);
+                showResult('Erro ao processar QR Code', 'invalid');
+            }
+        }
+
+        // Validação manual
+        async function validateManual() {
+            const ticketId = document.getElementById('ticketId').value.trim();
+            
+            if (!ticketId) {
+                showResult('Digite um ID de ticket válido', 'invalid');
+                return;
+            }
+            
+            await validateTicket(ticketId);
+        }
+
+        // Validar ticket
+        async function validateTicket(ticketId) {
+            try {
+                const response = await fetch(`/api/tickets/validate/${ticketId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                
+                if (data.valid) {
+                    showResult(
+                        `✅ TICKET VÁLIDO\n\nCliente: ${data.customer}\nID: ${data.ticketId}\nValidado em: ${new Date(data.usedAt).toLocaleString('pt-BR')}`,
+                        'valid'
+                    );
+                    loadStats(); // Atualizar estatísticas
+                } else {
+                    showResult(`❌ TICKET INVÁLIDO\n\nMotivo: ${data.error}`, 'invalid');
+                }
+                
+            } catch (error) {
+                console.error('Erro na validação:', error);
+                showResult('Erro ao validar ticket', 'invalid');
+            }
+        }
+
+        // Mostrar resultado
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result result-${type}`;
+            resultDiv.innerHTML = message.replace(/\n/g, '<br>');
+            resultDiv.classList.remove('hidden');
+            
+            // Auto-ocultar após 5 segundos
+            setTimeout(() => {
+                resultDiv.classList.add('hidden');
+            }, 5000);
+            
+            // Limpar input manual se existir
+            document.getElementById('ticketId').value = '';
+        }
+
+        // Auto-atualizar stats a cada 30 segundos
+        setInterval(loadStats, 30000);
+    </script>
 </body>
 </html>
