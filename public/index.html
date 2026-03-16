@@ -4,120 +4,197 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Copa Jovem - Ingressos</title>
+    <meta name="description" content="Compre seu ingresso para a Copa Jovem - Campeonato de Futebol. Pagamento via PIX, apenas R$ 15,00!">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/images/logo.png">
+    
+    <!-- Meta tags -->
+    <meta name="theme-color" content="#1e40af">
+    <meta property="og:title" content="Copa Jovem - Ingressos">
+    <meta property="og:description" content="Garanta já seu ingresso! Apenas R$ 15,00 via PIX">
+    <meta property="og:image" content="/images/logo.png">
+    <meta property="og:type" content="website">
+    
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <div class="container">
-        <!-- Header com Logo -->
-        <div class="header">
-            <div class="logo">
-                <img id="logoImg" src="/images/logo.png" alt="Copa Jovem" style="display: none;">
-                <div class="logo-placeholder" id="logoPlaceholder">COPA<br>JOVEM</div>
+        <!-- Header Principal -->
+        <header class="header">
+            <div class="logo-container floating">
+                <div class="logo glow">
+                    <img id="logoImg" src="/images/logo.png" alt="Copa Jovem" style="display: none;">
+                    <div class="logo-placeholder" id="logoPlaceholder">COPA<br>JOVEM</div>
+                </div>
             </div>
-            <h1>Copa Jovem</h1>
-            <p class="subtitle">Campeonato de Futebol</p>
-        </div>
+            <h1 class="main-title">Copa Jovem</h1>
+            <p class="subtitle">Campeonato de Futebol 2026</p>
+        </header>
 
-        <!-- Formulário de Compra -->
-        <div class="card" id="formSection">
-            <div class="price-info">
-                <div class="price">R$ 15,00</div>
+        <!-- Card Principal de Compra -->
+        <main class="main-card" id="formSection">
+            <!-- Seção de Preço -->
+            <section class="price-section">
+                <div class="price-value">R$ 15,00</div>
                 <div class="price-description">Ingresso Individual</div>
-            </div>
-
-            <form id="ticketForm">
-                <div class="form-group">
-                    <label for="name">Nome Completo *</label>
-                    <input type="text" id="name" name="name" required placeholder="Digite seu nome completo">
+                <div class="price-features">
+                    <span class="price-feature">Ingresso Digital</span>
+                    <span class="price-feature">Pagamento PIX</span>
+                    <span class="price-feature">Válido uma vez</span>
                 </div>
+            </section>
 
-                <div class="form-group">
-                    <label for="email">E-mail *</label>
-                    <input type="email" id="email" name="email" required placeholder="seu@email.com">
-                </div>
+            <!-- Formulário -->
+            <section class="form-section">
+                <form id="ticketForm">
+                    <div class="form-group">
+                        <label class="form-label" for="name">Nome Completo</label>
+                        <input 
+                            type="text" 
+                            id="name" 
+                            name="name" 
+                            class="form-input" 
+                            required 
+                            placeholder="Digite seu nome completo"
+                            autocomplete="name"
+                        >
+                    </div>
 
-                <div class="form-group">
-                    <label for="phone">Telefone/WhatsApp *</label>
-                    <input type="tel" id="phone" name="phone" required placeholder="(00) 00000-0000">
-                </div>
+                    <div class="form-group">
+                        <label class="form-label" for="email">E-mail</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-input" 
+                            required 
+                            placeholder="seu@email.com"
+                            autocomplete="email"
+                        >
+                    </div>
 
-                <button type="submit" class="btn" id="submitBtn">
-                    🎫 Comprar Ingresso via PIX
-                </button>
-            </form>
+                    <div class="form-group">
+                        <label class="form-label" for="phone">WhatsApp</label>
+                        <input 
+                            type="tel" 
+                            id="phone" 
+                            name="phone" 
+                            class="form-input" 
+                            required 
+                            placeholder="(62) 00000-0000"
+                            autocomplete="tel"
+                        >
+                    </div>
 
-            <div class="error" id="errorMessage"></div>
-        </div>
+                    <button type="submit" class="primary-btn" id="submitBtn">
+                        🎫 Comprar Ingresso via PIX
+                    </button>
+                </form>
+
+                <!-- Alert de Erro -->
+                <div class="alert alert-error" id="errorMessage"></div>
+            </section>
+        </main>
 
         <!-- Seção de Loading -->
-        <div class="loading" id="loadingSection">
-            <div class="spinner"></div>
-            <p>Gerando seu PIX...</p>
+        <div class="main-card loading-section" id="loadingSection">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Gerando seu PIX...</div>
         </div>
 
         <!-- Seção PIX -->
-        <div class="card pix-section" id="pixSection">
-            <h2>💳 Pagamento PIX</h2>
-            <p>Escaneie o QR Code ou copie o código para pagar:</p>
-            
-            <div class="pix-qr">
-                <img id="pixQrImage" alt="QR Code PIX" style="width: 100%; height: 100%;">
+        <div class="main-card pix-section" id="pixSection">
+            <div class="pix-header">
+                <h2 class="pix-title">💳 Pagamento PIX</h2>
+                <p class="pix-description">Escaneie o QR Code ou copie o código abaixo:</p>
             </div>
 
-            <div class="pix-code">
-                <small>Código PIX:</small>
-                <div id="pixCodeText"></div>
-                <button class="copy-btn" onclick="copyPixCode()">📋 Copiar Código</button>
+            <div class="pix-qr-container">
+                <div class="pix-qr">
+                    <img id="pixQrImage" alt="QR Code PIX">
+                </div>
             </div>
 
-            <div class="timer" id="paymentTimer">⏰ Tempo para pagamento: 30:00</div>
-
-            <div class="info">
-                <strong>Como pagar:</strong><br>
-                1. Abra seu app do banco<br>
-                2. Escaneie o QR Code ou cole o código<br>
-                3. Confirme o pagamento de R$ 15,00<br>
-                4. Aguarde a confirmação
+            <div class="pix-code-section">
+                <div class="pix-code-label">Código PIX para cópia:</div>
+                <div class="pix-code-text" id="pixCodeText"></div>
+                <button class="secondary-btn" onclick="copyPixCode()">📋 Copiar Código</button>
             </div>
 
-            <button class="btn" onclick="checkPaymentStatus()" id="checkBtn" style="margin-top: 20px;">
+            <div class="timer">
+                <div class="timer-text" id="paymentTimer">⏰ Tempo para pagamento: 30:00</div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-title">Como pagar:</div>
+                <ul class="info-steps">
+                    <li>Abra seu app do banco</li>
+                    <li>Escaneie o QR Code ou cole o código</li>
+                    <li>Confirme o pagamento de R$ 15,00</li>
+                    <li>Aguarde a confirmação automática</li>
+                </ul>
+            </div>
+
+            <button class="primary-btn" onclick="checkPaymentStatus()" id="checkBtn">
                 🔄 Verificar Pagamento
             </button>
         </div>
 
         <!-- Seção de Sucesso -->
-        <div class="card success-section" id="successSection">
-            <div class="success-icon">✅</div>
-            <h2>Pagamento Confirmado!</h2>
-            <p>Seu ingresso foi gerado com sucesso!</p>
+        <div class="main-card success-section" id="successSection">
+            <div class="success-icon">🎉</div>
+            <h2 class="success-title">Pagamento Confirmado!</h2>
+            <p class="success-message">Seu ingresso foi gerado com sucesso!</p>
 
-            <div class="ticket-info">
-                <strong id="ticketCustomerName"></strong><br>
-                <small>Ticket ID: <span id="ticketId"></span></small>
+            <div class="ticket-info-box">
+                <div class="customer-name" id="ticketCustomerName"></div>
+                <div class="ticket-id">Ticket ID: <span id="ticketId"></span></div>
+                
+                <div class="ticket-qr">
+                    <img id="ticketQrImage" alt="QR Code do Ingresso">
+                </div>
             </div>
 
-            <div class="ticket-qr">
-                <img id="ticketQrImage" alt="QR Code do Ingresso" style="width: 100%; height: 100%;">
+            <div class="info-box">
+                <div class="info-title">⚠️ IMPORTANTE:</div>
+                <ul class="info-steps">
+                    <li>Salve este QR Code no seu celular</li>
+                    <li>Apresente na entrada do evento</li>
+                    <li>Não compartilhe com terceiros</li>
+                    <li>Válido apenas uma vez</li>
+                </ul>
             </div>
 
-            <div class="info">
-                <strong>⚠️ IMPORTANTE:</strong><br>
-                • Salve este QR Code<br>
-                • Apresente na entrada do evento<br>
-                • Não compartilhe com terceiros<br>
-                • Válido apenas uma vez
+            <div class="btn-group">
+                <button class="primary-btn" onclick="downloadTicket()">
+                    💾 Baixar Ingresso
+                </button>
+                <button class="secondary-btn" onclick="newTicket()">
+                    🎫 Novo Ingresso
+                </button>
             </div>
-
-            <button class="btn" onclick="downloadTicket()" style="margin-top: 15px;">
-                💾 Salvar Ingresso
-            </button>
-
-            <button class="btn" onclick="newTicket()" style="background: #6c757d; margin-top: 10px;">
-                🎫 Comprar Outro Ingresso
-            </button>
         </div>
+
+        <!-- Footer -->
+        <footer style="text-align: center; margin-top: 40px; color: rgba(255,255,255,0.7); font-size: 14px;">
+            <p>&copy; 2026 Copa Jovem. Todos os direitos reservados.</p>
+            <p>Suporte: (62) 98401-6464 - Rafael</p>
+        </footer>
     </div>
 
+    <!-- Scripts -->
     <script src="/js/app.js"></script>
+    
+    <!-- Analytics (opcional) -->
+    <script>
+        // Google Analytics ou outros trackers podem ser adicionados aqui
+    </script>
 </body>
 </html>

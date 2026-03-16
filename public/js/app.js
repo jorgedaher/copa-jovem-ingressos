@@ -204,10 +204,10 @@ function downloadTicket() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         // Título
-        ctx.fillStyle = '#003366';
-        ctx.font = 'bold 24px Arial';
+        ctx.fillStyle = '#1e40af';
+        ctx.font = 'bold 28px Inter, Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('COPA JOVEM', canvas.width/2, 40);
+        ctx.fillText('COPA JOVEM 2026', canvas.width/2, 50);
         
         // Nome
         ctx.font = '18px Arial';
