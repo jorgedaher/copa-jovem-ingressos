@@ -34,7 +34,7 @@ function crc16(str) {
 
 // Gerar código PIX
 function generatePixCode(amount = 15.00, description = 'Copa Jovem Ingresso') {
-    const merchantName = 'RAFAEL SILVA';
+    const merchantName = 'JOAO PEDRO ZENDRON';
     const merchantCity = 'GOIANIA';
     const pixKey = '62999646263'; // Sua chave PIX
     
@@ -140,8 +140,38 @@ app.post('/api/payments/generate-pix', async (req, res) => {
         const ticketId = generateId();
         const pixCode = generatePixCode(15.00, `Copa Jovem ${ticketId.substr(-6)}`);
         
-        // Usar QR Code PIX real fornecido
-        const pixQrImagePath = '/images/QRCODE.jpg';
+        // Usar QR Code PIX real fornecido ou gerar um novo
+        let pixQrImagePath;
+        try {
+            // Verificar se o arquivo QR Code existe
+            const fs = require('fs');
+            const qrPath = path.join(__dirname, 'public', 'images', 'QRCODE.jpg');
+            if (fs.existsSync(qrPath)) {
+                pixQrImagePath = '/images/QRCODE.jpg';
+            } else {
+                // Fallback: gerar QR Code
+                const qrCodeDataURL = await QRCode.toDataURL(pixCode, {
+                    width: 300,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#ffffff'
+                    }
+                });
+                pixQrImagePath = qrCodeDataURL;
+            }
+        } catch (error) {
+            // Em caso de erro, gerar QR Code
+            const qrCodeDataURL = await QRCode.toDataURL(pixCode, {
+                width: 300,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                }
+            });
+            pixQrImagePath = qrCodeDataURL;
+        }
         
         // Salvar ticket
         const ticket = {
