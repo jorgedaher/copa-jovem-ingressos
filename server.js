@@ -12,6 +12,9 @@ app.use(express.static('public'));
 const tickets = new Map();
 const payments = new Map();
 
+// QR Code PIX customizado (você pode atualizar via /api/admin/update-pix-qr)
+let customPixQR = null;
+
 // Função para calcular CRC16 (para PIX)
 function crc16(str) {
     let crc = 0xFFFF;
@@ -137,15 +140,8 @@ app.post('/api/payments/generate-pix', async (req, res) => {
         const ticketId = generateId();
         const pixCode = generatePixCode(15.00, `Copa Jovem ${ticketId.substr(-6)}`);
         
-        // Gerar QR Code
-        const qrCodeDataURL = await QRCode.toDataURL(pixCode, {
-            width: 300,
-            margin: 2,
-            color: {
-                dark: '#000000',
-                light: '#ffffff'
-            }
-        });
+        // Usar QR Code PIX real fornecido
+        const pixQrImagePath = '/images/QRCODE.jpg';
         
         // Salvar ticket
         const ticket = {
@@ -173,7 +169,7 @@ app.post('/api/payments/generate-pix', async (req, res) => {
         res.json({
             ticketId,
             pixCode,
-            pixQrCode: qrCodeDataURL,
+            pixQrCode: pixQrImagePath,
             customerName,
             amount: 15.00
         });
@@ -409,6 +405,23 @@ app.get('/health', (req, res) => {
         tickets: tickets.size,
         payments: payments.size
     });
+});
+
+// Teste de imagem
+app.get('/test-image', (req, res) => {
+    const fs = require('fs');
+    const imagePath = path.join(__dirname, 'public', 'images', 'logo.png');
+    
+    if (fs.existsSync(imagePath)) {
+        const stats = fs.statSync(imagePath);
+        res.json({
+            exists: true,
+            size: stats.size,
+            path: '/images/logo.png'
+        });
+    } else {
+        res.json({ exists: false });
+    }
 });
 
 // Middleware de erro

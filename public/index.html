@@ -187,6 +187,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+            border-radius: 8px;
         }
 
         .pix-code {
@@ -364,7 +365,7 @@
     <div class="container">
         <div class="header">
             <div class="logo">
-                <img src="/images/logo.png" alt="Copa Jovem Logo">
+                <img src="/images/logo.png?v=2" alt="Copa Jovem Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='COPA<br>JOVEM';">
             </div>
             <h1>Copa Jovem</h1>
             <p class="subtitle">Campeonato de Futebol 2026</p>
@@ -520,7 +521,8 @@
                 currentTicket = data;
                 pixCode = data.pixCode;
 
-                document.getElementById('pixQrImg').src = data.pixQrCode;
+                // Usar QR Code real fornecido
+                document.getElementById('pixQrImg').src = data.pixQrCode + '?v=' + Date.now();
                 document.getElementById('pixCodeText').textContent = data.pixCode;
 
                 showSection('pixSection');
