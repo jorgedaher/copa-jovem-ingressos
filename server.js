@@ -12,8 +12,158 @@ app.use(express.static('public'));
 const tickets = new Map();
 const payments = new Map();
 
-// QR Code PIX customizado (você pode atualizar via /api/admin/update-pix-qr)
+// QR Code PIX customizado
 let customPixQR = null;
+
+// Sistema de verificação PIX real
+const pixTransactions = new Map(); // Armazena transações PIX recebidas
+
+// Função para verificar PIX real via banco (implementar com sua API bancária)
+async function checkRealPixPayment(pixCode, expectedAmount) {
+    // INTEGRAÇÃO REAL COM SEU BANCO
+    // Exemplo: consultar extrato via API do banco
+    // Esta função deve ser implementada com a API do seu banco
+    
+    try {
+        // Exemplo de integração com Mercado Pago, PagSeguro, Banco Inter, etc.
+        // const response = await fetch('https://api.mercadopago.com/v1/payments/search', {
+        //     headers: {
+        //         'Authorization': `Bearer ${process.env.MERCADO_PAGO_TOKEN}`,
+        //     },
+        //     params: {
+        //         'external_reference': pixCode,
+        //         'status': 'approved'
+        //     }
+        // });
+        
+        // Por enquanto, vamos simular checagem em transações recebidas
+        for (const [txId, transaction] of pixTransactions.entries()) {
+            if (transaction.amount === expectedAmount && 
+                transaction.status === 'received' &&
+                !transaction.used) {
+                
+                // Marcar como usado
+                transaction.used = true;
+                transaction.pixCode = pixCode;
+                
+                return {
+                    found: true,
+                    transactionId: txId,
+                    amount: transaction.amount,
+                    receivedAt: transaction.receivedAt
+                };
+            }
+        }
+        
+        return { found: false };
+        
+    } catch (error) {
+        console.error('Erro ao verificar PIX:', error);
+        return { found: false, error: error.message };
+    }
+}
+
+// Endpoint para receber notificações PIX do banco (webhook)
+app.post('/api/webhook/pix-received', async (req, res) => {
+    try {
+        // Validar webhook do banco (implementar validação de segurança)
+        const { transactionId, amount, pixKey, endToEndId, description } = req.body;
+        
+        // Verificar se é para nossa chave PIX
+        if (pixKey !== '62999646263') {
+            return res.status(400).json({ error: 'PIX key mismatch' });
+        }
+        
+        // Armazenar transação recebida
+        pixTransactions.set(transactionId, {
+            amount: parseFloat(amount),
+            pixKey,
+            endToEndId,
+            description,
+            receivedAt: new Date(),
+            status: 'received',
+            used: false
+        });
+        
+        console.log(`PIX recebido: R$ ${amount} - ID: ${transactionId}`);
+        
+        // Tentar encontrar ticket pendente correspondente
+        await processReceivedPix(transactionId, parseFloat(amount));
+        
+        res.json({ success: true, message: 'PIX processado' });
+        
+    } catch (error) {
+        console.error('Erro no webhook PIX:', error);
+        res.status(500).json({ error: 'Erro interno' });
+    }
+});
+
+// Processar PIX recebido e confirmar tickets
+async function processReceivedPix(transactionId, amount) {
+    // Procurar tickets pendentes com valor correspondente
+    for (const [ticketId, ticket] of tickets.entries()) {
+        const payment = payments.get(ticketId);
+        
+        if (payment && 
+            payment.status === 'pending' && 
+            ticket.amount === amount) {
+            
+            // Confirmar pagamento
+            payment.status = 'paid';
+            payment.paidAt = new Date();
+            payment.transactionId = transactionId;
+            
+            ticket.status = 'paid';
+            ticket.paidAt = new Date().toISOString();
+            
+            // Gerar QR Code do ingresso
+            const ticketQRCode = await generateTicketQR(ticket);
+            ticket.qrCode = ticketQRCode;
+            
+            // Enviar notificações
+            await sendTicketNotifications(ticket);
+            
+            console.log(`Ticket ${ticketId} confirmado automaticamente via PIX ${transactionId}`);
+            break;
+        }
+    }
+}
+
+// Função para enviar notificações
+async function sendTicketNotifications(ticket) {
+    // WhatsApp
+    const whatsappMessage = `🎫 *COPA JOVEM - INGRESSO CONFIRMADO*\n\n` +
+                           `Olá ${ticket.customerName}!\n\n` +
+                           `✅ Pagamento PIX confirmado!\n` +
+                           `💰 Valor: R$ ${ticket.amount.toFixed(2)}\n` +
+                           `🎟️ Ticket ID: ${ticket.ticketId}\n\n` +
+                           `⚠️ *IMPORTANTE:*\n` +
+                           `• Apresente o QR Code na entrada\n` +
+                           `• Válido apenas uma vez\n` +
+                           `• Guarde bem este código\n\n` +
+                           `Nos vemos na Copa Jovem! ⚽`;
+    
+    await sendWhatsApp(ticket.customerPhone, whatsappMessage);
+    
+    // Email
+    const emailMessage = `<h2>🎫 Copa Jovem - Ingresso Confirmado!</h2>\n` +
+                        `<p><strong>Olá ${ticket.customerName}!</strong></p>\n` +
+                        `<p>✅ Seu pagamento PIX foi confirmado automaticamente!</p>\n` +
+                        `<ul>\n` +
+                        `<li>💰 Valor: R$ ${ticket.amount.toFixed(2)}</li>\n` +
+                        `<li>🎟️ Ticket ID: ${ticket.ticketId}</li>\n` +
+                        `<li>📅 Data: ${new Date().toLocaleDateString('pt-BR')}</li>\n` +
+                        `</ul>\n` +
+                        `<h3>⚠️ IMPORTANTE:</h3>\n` +
+                        `<ul>\n` +
+                        `<li>Apresente o QR Code na entrada</li>\n` +
+                        `<li>Válido apenas uma vez</li>\n` +
+                        `<li>Guarde bem este código</li>\n` +
+                        `</ul>\n` +
+                        `<p>Nos vemos na Copa Jovem! ⚽</p>`;
+    
+    await sendEmail(ticket.customerEmail, 'Copa Jovem - Seu Ingresso', emailMessage);
+}
 
 // Função para calcular CRC16 (para PIX)
 function crc16(str) {
@@ -211,7 +361,7 @@ app.post('/api/payments/generate-pix', async (req, res) => {
 });
 
 // Verificar status do pagamento
-app.get('/api/payments/status/:ticketId', (req, res) => {
+app.get('/api/payments/status/:ticketId', async (req, res) => {
     const { ticketId } = req.params;
     
     const payment = payments.get(ticketId);
@@ -219,11 +369,80 @@ app.get('/api/payments/status/:ticketId', (req, res) => {
         return res.status(404).json({ error: 'Pagamento não encontrado' });
     }
     
+    // Se ainda está pendente, verificar PIX real
+    if (payment.status === 'pending') {
+        const ticket = tickets.get(ticketId);
+        if (ticket) {
+            // Verificar se há PIX recebido correspondente
+            const pixCheck = await checkRealPixPayment(payment.pixCode, ticket.amount);
+            
+            if (pixCheck.found) {
+                // Confirmar pagamento automaticamente
+                payment.status = 'paid';
+                payment.paidAt = new Date();
+                payment.transactionId = pixCheck.transactionId;
+                
+                ticket.status = 'paid';
+                ticket.paidAt = new Date().toISOString();
+                
+                // Gerar QR Code e enviar notificações
+                const ticketQRCode = await generateTicketQR(ticket);
+                ticket.qrCode = ticketQRCode;
+                
+                await sendTicketNotifications(ticket);
+                
+                console.log(`Pagamento ${ticketId} confirmado automaticamente`);
+            }
+        }
+    }
+    
     res.json({
         ticketId,
         paymentStatus: payment.status,
         createdAt: payment.createdAt,
-        paidAt: payment.paidAt || null
+        paidAt: payment.paidAt || null,
+        transactionId: payment.transactionId || null
+    });
+});
+
+// Endpoint para simular PIX recebido (APENAS PARA TESTES)
+app.post('/api/admin/simulate-pix-received', async (req, res) => {
+    const { amount = 15.00, description = 'Teste PIX' } = req.body;
+    
+    const transactionId = 'TX_' + Date.now();
+    
+    // Simular PIX recebido
+    pixTransactions.set(transactionId, {
+        amount: parseFloat(amount),
+        pixKey: '62999646263',
+        endToEndId: 'E' + transactionId,
+        description,
+        receivedAt: new Date(),
+        status: 'received',
+        used: false
+    });
+    
+    // Processar PIX
+    await processReceivedPix(transactionId, parseFloat(amount));
+    
+    res.json({ 
+        success: true, 
+        transactionId,
+        amount,
+        message: 'PIX simulado e processado'
+    });
+});
+
+// Listar transações PIX (admin)
+app.get('/api/admin/pix-transactions', (req, res) => {
+    const transactions = Array.from(pixTransactions.entries()).map(([id, data]) => ({
+        transactionId: id,
+        ...data
+    }));
+    
+    res.json({
+        total: transactions.length,
+        transactions: transactions.sort((a, b) => new Date(b.receivedAt) - new Date(a.receivedAt))
     });
 });
 

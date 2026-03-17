@@ -424,7 +424,7 @@
                 </div>
 
                 <div class="timer">
-                    ⏰ <span id="timer">Aguardando confirmação do pagamento PIX...</span>
+                    ⏰ <span id="timer">🔍 Verificando PIX automaticamente...</span>
                 </div>
 
                 <div class="instructions">
@@ -433,10 +433,13 @@
                         <li>Abra seu app do banco</li>
                         <li>Escaneie o QR Code ou cole o código</li>
                         <li>Confirme R$ 15,00 para <strong>JOÃO PEDRO ZENDRON</strong></li>
-                        <li>Aguarde a confirmação (pode levar alguns minutos)</li>
+                        <li>A confirmação é automática após o PIX!</li>
                     </ol>
                     <div style="background: #fef3c7; padding: 10px; border-radius: 8px; margin-top: 10px; color: #92400e; font-size: 14px; border: 1px solid #fcd34d;">
                         💳 <strong>PIX para:</strong> JOÃO PEDRO ZENDRON - (62) 99964-6263
+                    </div>
+                    <div style="background: #dbeafe; padding: 10px; border-radius: 8px; margin-top: 10px; color: #1e40af; font-size: 13px; border: 1px solid #93c5fd;">
+                        ✅ Sistema verificando pagamentos automaticamente a cada 2 segundos
                     </div>
                 </div>
 
@@ -536,7 +539,7 @@
         };
 
         function startChecking() {
-            checkTimer = setInterval(checkPayment, 5000); // Verificar a cada 5 segundos
+            checkTimer = setInterval(checkPayment, 2000); // Verificar a cada 2 segundos para PIX real
         }
 
         async function checkPayment() {
